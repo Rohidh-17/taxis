@@ -1,0 +1,53 @@
+<script>
+                    function getLocation() {
+                        if (navigator.geolocation) {
+                            navigator.geolocation.getCurrentPosition(showPosition);
+                        } else {
+                            alert("Geolocation is not supported by this browser.");
+                        }
+                    }
+                
+                    function showPosition(position) {
+                        var lat = position.coords.latitude;
+                        var lng = position.coords.longitude;
+                        document.getElementById("lat").value = lat;
+                        document.getElementById("lon").value = lng;
+                
+                        // Create a Geocoder instance
+                        var geocoder = new google.maps.Geocoder();
+                
+                        // Create a LatLng object with the obtained coordinates
+                        var myCenter = new google.maps.LatLng(lat, lng);
+                
+                        // Get the address through reverse geocoding
+                        geocoder.geocode({ 'location': myCenter }, function (results, status) {
+                            if (status === 'OK') {
+                                if (results[0]) {
+                                    var address = results[0].formatted_address;
+                                    document.getElementById("address").value = address;
+                                } else {
+                                    alert("No address found for this location.");
+                                }
+                            } else {
+                                alert("Geocoding failed due to: " + status);
+                            }
+                        });
+                
+                        var mapCanvas = document.getElementById("map");
+                        var mapOptions = {
+                            center: myCenter,
+                            zoom: 20
+                        };
+                        var map = new google.maps.Map(mapCanvas, mapOptions);
+                        var marker = new google.maps.Marker({
+                            position: myCenter,
+                            map: map
+                        });
+                
+                        // Zoom to 9 when clicking on marker
+                        google.maps.event.addListener(marker, 'click', function () {
+                            map.setZoom(9);
+                            map.setCenter(marker.getPosition());
+                        });
+                    }
+                </script>
